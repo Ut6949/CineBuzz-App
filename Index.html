@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBuzz - Complete Connected App</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px 0;
+      background: #0D0D11;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      max-width: 600px;
+      padding: 0 16px;
+    }
+    .screen-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ccc;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .screen-pill:hover,
+    .screen-pill.active {
+      background: #E63946;
+      border-color: #E63946;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
+    }
+    .phone-wrapper {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 10px #1E1E24, 0 0 0 12px #2A2A32;
+      overflow: hidden;
+      background: #FAFAFA;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 125px;
+      height: 30px;
+      background: #1E1E24;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .phone-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #FAFAFA;
+    }
+    .hint-bar {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Jump Switcher -->
+  <div class="top-controls">
+    <button class="screen-pill active" onclick="loadScreen('01-home.html', this)">01 Home</button>
+    <button class="screen-pill" onclick="loadScreen('02-movie-details.html', this)">02 Details</button>
+    <button class="screen-pill" onclick="loadScreen('03-cinema-showtime.html', this)">03 Showtime</button>
+    <button class="screen-pill" onclick="loadScreen('04-seats.html', this)">04 Seats</button>
+    <button class="screen-pill" onclick="loadScreen('05-review.html', this)">05 Review</button>
+    <button class="screen-pill" onclick="loadScreen('06-payment.html', this)">06 Payment</button>
+    <button class="screen-pill" onclick="loadScreen('07-confirmation.html', this)">07 Ticket</button>
+  </div>
+
+  <!-- Mobile Viewport Container -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
+    <iframe id="app-frame" class="phone-frame" src="01-home.html" title="CineBuzz App"></iframe>
+  </div>
+
+  <div class="hint-bar">
+    CineBuzz All-In-One Flow • Click inside the phone to navigate naturally or use the pills above to jump between screens.
+  </div>
+
+  <script>
+    const frame = document.getElementById('app-frame');
+    function loadScreen(src, btn) {
+      frame.src = src;
+      document.querySelectorAll('.screen-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    // Synchronize active pill when iframe navigates internally
+    frame.addEventListener('load', () => {
+      try {
+        const path = frame.contentWindow.location.pathname.split('/').pop();
+        document.querySelectorAll('.screen-pill').forEach(btn => {
+          if (btn.getAttribute('onclick').includes(path)) {
+            document.querySelectorAll('.screen-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+          }
+        });
+      } catch (e) {
+        // Cross-origin fallback
+      }
+    });
+  </script>
+</body>
+</html>

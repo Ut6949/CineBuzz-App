@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, height=844, initial-scale=1.0">
+  <title>CineBuzz - 01 Home</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8A8A8A;
+      --accent: #E63946;
+      --accent-light: #FCE8EA;
+      --border: #EFEFEF;
+      --radius-card: 18px;
+      --radius-btn: 16px;
+      --radius-pill: 999px;
+      --radius-input: 14px;
+      --radius-poster: 12px;
+      --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-floating: 0 12px 32px -4px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow-cta: 0 8px 24px -4px rgba(230, 57, 70, 0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    svg { flex-shrink: 0; }
+    body {
+      background: #121214;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, sans-serif;
+      color: var(--text-primary);
+    }
+    .screen {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+    .statusbar {
+      height: 44px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg);
+    }
+    .statusbar-icons { display: flex; align-items: center; gap: 6px; }
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 96px;
+      scrollbar-width: none;
+    }
+    .scroll-content::-webkit-scrollbar { display: none; }
+    
+    /* Header Row with Official CZ Logo */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 16px;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cz-logo-ticket {
+      width: 44px;
+      height: 24px;
+      color: #1A1A1A;
+      flex: none;
+    }
+    .user-greeting { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .user-name { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 1px; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-pill);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      position: relative;
+    }
+    .notif-badge {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    .search-bar {
+      height: 46px;
+      border-radius: var(--radius-input);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      margin-bottom: 20px;
+    }
+    .search-bar svg,
+    .search-icon {
+      width: 20px !important;
+      height: 20px !important;
+      min-width: 20px !important;
+      min-height: 20px !important;
+      max-width: 20px !important;
+      max-height: 20px !important;
+      flex: 0 0 20px !important;
+      flex-shrink: 0 !important;
+      color: var(--text-secondary);
+      display: block;
+    }
+    .search-bar span {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hero-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 24px;
+    }
+    .hero-banner-wrap {
+      position: relative;
+      height: 180px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #1A1A1E;
+      margin-bottom: 12px;
+    }
+    .hero-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+    }
+    .hero-format-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      align-self: flex-start;
+      margin-bottom: 4px;
+    }
+    .hero-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.2px;
+    }
+    .hero-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .pill-group { display: flex; gap: 8px; margin-bottom: 10px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-pill);
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .pill-subtle { background: var(--accent-light); color: var(--accent); }
+    .meta-chips { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #F6F6F6;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .hero-tagline {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 14px;
+    }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-half-secondary {
+      flex: 1;
+      height: 46px;
+      border-radius: var(--radius-btn);
+      background: #FAFAFA;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-half-primary {
+      flex: 1;
+      height: 46px;
+      border-radius: var(--radius-btn);
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.35);
+      text-decoration: none;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+    .section-link { font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
+    .horizontal-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 8px;
+    }
+    .horizontal-strip::-webkit-scrollbar { display: none; }
+    .poster-card {
+      flex: none;
+      width: 126px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 8px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      text-decoration: none;
+    }
+    .poster-img {
+      width: 100%;
+      height: 154px;
+      border-radius: var(--radius-poster);
+      object-fit: cover;
+      display: block;
+      background: #251B2E;
+    }
+    .poster-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .poster-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+    .poster-img.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: rgba(255,255,255,0.92);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .poster-img.placeholder .ph-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+
+    /* Modern Glassy Floating Bottom Navigation Bar (Present on every screen) */
+    .floating-nav {
+      position: absolute;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-floating);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      z-index: 50;
+    }
+    .nav-btn {
+      height: 44px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .nav-btn.icon-only { width: 44px; padding: 0; }
+    .nav-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+    }
+    .nav-btn svg { width: 20px; height: 20px; flex: none; }
+  </style>
+</head>
+<body>
+
+<div class="screen" id="screen-01">
+  <!-- Native Status Bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusbar-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1" width="3" height="11" rx="0.5"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 10.5a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM3.8 6.6a6 6 0 0 1 8.4 0l-1.2 1.2a4.3 4.3 0 0 0-6 0zM1 3.8a10 10 0 0 1 14 0L13.8 5a8.3 8.3 0 0 0-11.6 0z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Header with Official CineBuzz "CZ" Logo -->
+    <div class="header-row">
+      <div class="brand-group">
+        <!-- Static CZ Ticket Brandmark -->
+        <svg class="cz-logo-ticket" viewBox="0 0 180 100" fill="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0H170V8H180V16H170V24H180V32H170V40H180V48H170V56H180V64H170V72H180V80H170V88H180V96H170V100H10V96H0V88H10V80H0V72H10V64H0V56H10V48H0V40H10V32H0V24H10V16H0V8H10V0ZM18 10H24V16H18V10ZM18 24H24V30H18V24ZM18 38H24V44H18V38ZM18 52H24V58H18V52ZM18 66H24V72H18V66ZM18 80H24V86H18V80ZM156 10H162V16H156V10ZM156 24H162V30H156V24ZM156 38H162V44H156V38ZM156 52H162V58H156V52ZM156 66H162V72H156V66ZM156 80H162V86H156V80Z"/>
+          <g transform="translate(90, 50) skewX(-14) translate(-90, -50)">
+            <path fill="#FFFFFF" d="M40 28C40 23 44 19 52 19H77C85 19 89 23 89 31V39H71V34H58V66H71V61H89V69C89 77 85 81 77 81H52C44 81 40 77 40 72V28Z"/>
+            <path fill="#FFFFFF" d="M94 19H144V33L115 67H144V81H94V67L123 33H94V19Z"/>
+          </g>
+        </svg>
+        <div>
+          <div class="user-greeting">CineBuzz</div>
+          <div class="user-name">Hi there 👋</div>
+        </div>
+      </div>
+      <div class="icon-btn" style="width:38px;height:38px;min-width:38px;min-height:38px;flex:0 0 38px;flex-shrink:0;">
+        <span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </span>
+        <span class="notif-badge"></span>
+      </div>
+    </div>
+
+    <!-- Search Bar (Fixed 20x20px icon wrapper inline with placeholder text) -->
+    <div class="search-bar">
+      <div class="search-icon-wrap" style="width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; flex: 0 0 20px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; flex: 0 0 20px; flex-shrink: 0; display: block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <span>Search movies, cinemas...</span>
+    </div>
+
+    <!-- Hero Feature: MIDNIGHT ECHO -->
+    <div class="hero-card">
+      <div class="hero-banner-wrap">
+        <img class="hero-banner-img" src="./assets/images/midnight_echo_hero_1790339263968.jpg" alt="Midnight Echo Banner" onerror="this.onerror=null; this.src='./src/assets/images/midnight_echo_hero_1790339263968.jpg';">
+        <div class="hero-scrim">
+          <div class="hero-format-badge">Now Playing • IMAX</div>
+          <div class="hero-title">MIDNIGHT ECHO</div>
+        </div>
+        <a href="02-movie-details.html" class="hero-play-btn" title="Watch Trailer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </a>
+      </div>
+
+      <div class="pill-group">
+        <span class="pill pill-subtle">Thriller</span>
+        <span class="pill pill-subtle">Mystery</span>
+      </div>
+
+      <div class="meta-chips">
+        <span class="chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#E63946"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+          8.4
+        </span>
+        <span class="chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          2h 15m
+        </span>
+        <span class="chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/></svg>
+          PG-13
+        </span>
+      </div>
+
+      <div class="hero-tagline">"The truth doesn't stay buried."</div>
+
+      <div class="btn-row">
+        <a href="02-movie-details.html" class="btn-half-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Details
+        </a>
+        <a href="03-cinema-showtime.html" class="btn-half-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg>
+          Book Now
+        </a>
+      </div>
+    </div>
+
+    <!-- Now Showing Horizontal Carousel -->
+    <div style="margin-bottom: 24px;">
+      <div class="section-head">
+        <h2 class="section-title">Now Showing</h2>
+        <a href="02-movie-details.html" class="section-link">See all</a>
+      </div>
+      <div class="horizontal-strip">
+        <a href="02-movie-details.html" class="poster-card">
+          <img class="poster-img" src="./assets/images/midnight_echo_poster_1790339278870.jpg" alt="Midnight Echo" onerror="this.onerror=null; this.src='./src/assets/images/midnight_echo_poster_1790339278870.jpg';">
+          <div class="poster-title">Midnight Echo</div>
+          <div class="poster-sub">Thriller • 2h 15m</div>
+        </a>
+        <a href="02-movie-details.html" class="poster-card">
+          <img class="poster-img" src="./assets/images/poster_neon_horizon_1790339291148.jpg" alt="Neon Horizon" onerror="this.onerror=null; this.src='./src/assets/images/poster_neon_horizon_1790339291148.jpg';">
+          <div class="poster-title">Neon Horizon</div>
+          <div class="poster-sub">Sci-Fi • 1h 50m</div>
+        </a>
+        <a href="02-movie-details.html" class="poster-card">
+          <img class="poster-img" src="./assets/images/poster_last_orbit_1790339303650.jpg" alt="The Last Orbit" onerror="this.onerror=null; this.src='./src/assets/images/poster_last_orbit_1790339303650.jpg';">
+          <div class="poster-title">The Last Orbit</div>
+          <div class="poster-sub">Adventure • 2h 05m</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Coming Soon Section -->
+    <div style="margin-bottom: 16px;">
+      <div class="section-head">
+        <h2 class="section-title">Coming Soon</h2>
+        <span class="caption">Explore</span>
+      </div>
+      <div class="horizontal-strip">
+        <div class="poster-card">
+          <div class="poster-img placeholder" style="background: linear-gradient(155deg, #1B2A4A 0%, #0D63F8 55%, #00D4FF 100%);" aria-label="Cyber Syndicate poster">
+            <span class="ph-icon">🕶️</span>
+            <span>CYBER<br>SYNDICATE</span>
+          </div>
+          <div class="poster-title">Cyber Syndicate</div>
+          <div class="poster-sub">Release Nov 12</div>
+        </div>
+        <div class="poster-card">
+          <div class="poster-img placeholder" style="background: linear-gradient(155deg, #2B0B3F 0%, #7A1FA2 55%, #E63946 100%);" aria-label="Shadow Realm poster">
+            <span class="ph-icon">🌒</span>
+            <span>SHADOW<br>REALM</span>
+          </div>
+          <div class="poster-title">Shadow Realm</div>
+          <div class="poster-sub">Release Dec 04</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modern Floating Bottom Navigation Bar (Active: Home) -->
+  <nav class="floating-nav" aria-label="Bottom Navigation">
+    <a href="01-home.html" class="nav-btn active" title="Home" aria-current="page">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+      <span>Home</span>
+    </a>
+    <a href="02-movie-details.html" class="nav-btn icon-only" title="Explore Movies">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </span>
+    </a>
+    <a href="07-confirmation.html" class="nav-btn icon-only" title="Tickets & Booking">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19"/></svg>
+      </span>
+    </a>
+    <a href="01-home.html" class="nav-btn icon-only" title="Profile">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+    </a>
+  </nav>
+</div>
+
+</body>
+</html>

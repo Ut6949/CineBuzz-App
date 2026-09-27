@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 100" fill="none">
+  <!-- Ticket Body with side notches/teeth -->
+  <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="
+    M 10 0
+    H 170
+    V 8 H 180 V 16 H 170 V 24 H 180 V 32 H 170 V 40 H 180 V 48 H 170 V 56 H 180 V 64 H 170 V 72 H 180 V 80 H 170 V 88 H 180 V 96 H 170 V 100
+    H 10
+    V 96 H 0 V 88 H 10 V 80 H 0 V 72 H 10 V 64 H 0 V 56 H 10 V 48 H 0 V 40 H 10 V 32 H 0 V 24 H 10 V 16 H 0 V 8 H 10
+    Z
+    M 18 10 H 24 V 16 H 18 Z
+    M 18 24 H 24 V 30 H 18 Z
+    M 18 38 H 24 V 44 H 18 Z
+    M 18 52 H 24 V 58 H 18 Z
+    M 18 66 H 24 V 72 H 18 Z
+    M 18 80 H 24 V 86 H 18 Z
+    M 156 10 H 162 V 16 H 156 Z
+    M 156 24 H 162 V 30 H 156 Z
+    M 156 38 H 162 V 44 H 156 Z
+    M 156 52 H 162 V 58 H 156 Z
+    M 156 66 H 162 V 72 H 156 Z
+    M 156 80 H 162 V 86 H 156 Z
+  "/>
+  <!-- Center CZ Cutout (using inverse background color or cut out) -->
+  <g transform="translate(90, 50) skewX(-14) translate(-90, -50)">
+    <!-- Letter C -->
+    <path fill="white" d="M 40 28 C 40 24 43 20 50 20 H 76 C 84 20 88 24 88 32 V 40 H 70 V 35 H 58 V 65 H 70 V 60 H 88 V 68 C 88 76 84 80 76 80 H 50 C 43 80 40 76 40 72 Z"/>
+    <!-- Letter Z -->
+    <path fill="white" d="M 94 20 H 144 V 34 L 115 67 H 144 V 80 H 94 V 66 L 123 33 H 94 Z"/>
+  </g>
+</svg>

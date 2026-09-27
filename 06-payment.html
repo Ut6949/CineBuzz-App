@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, height=844, initial-scale=1.0">
+  <title>CineBuzz - 06 Payment</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8A8A8A;
+      --accent: #E63946;
+      --accent-light: #FCE8EA;
+      --border: #EFEFEF;
+      --border-strong: #E2E2E2;
+      --radius-card: 18px;
+      --radius-btn: 16px;
+      --radius-pill: 999px;
+      --radius-input: 14px;
+      --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-floating: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
+      --shadow-cta: 0 8px 24px -4px rgba(230, 57, 70, 0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    svg { flex-shrink: 0; }
+    body {
+      background: #121214;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, sans-serif;
+      color: var(--text-primary);
+    }
+    .screen {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+    .statusbar {
+      height: 44px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg);
+      z-index: 30;
+    }
+    .statusbar-icons { display: flex; align-items: center; gap: 6px; }
+    .topbar {
+      flex: none;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: var(--bg);
+    }
+    .topbar-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-pill);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .cz-logo-small {
+      width: 36px;
+      height: 20px;
+      color: #1A1A1A;
+    }
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 20px 96px;
+      scrollbar-width: none;
+    }
+    .scroll-content::-webkit-scrollbar { display: none; }
+
+    /* Amount Due Header Card */
+    .amount-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .amount-lbl { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .amount-val { font-size: 34px; font-weight: 800; color: var(--text-primary); margin: 3px 0 1px; }
+    .amount-sub { font-size: 11px; color: var(--text-secondary); }
+
+    .section-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Payment Option Tile */
+    .pay-tile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 15px;
+      border-radius: var(--radius-btn);
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.15s ease;
+    }
+    .pay-tile:active {
+      transform: scale(0.98);
+    }
+    .pay-tile.selected {
+      border-color: var(--accent);
+      background: #FFFDFD;
+      box-shadow: 0 0 0 1px var(--accent), 0 2px 8px rgba(230, 57, 70, 0.1);
+    }
+    .pay-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      color: var(--accent);
+    }
+    .pay-info { flex: 1; }
+    .pay-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .pay-desc { font-size: 10.5px; color: var(--text-secondary); margin-top: 1px; }
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+    .radio-circle.checked {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+    .radio-circle.checked::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-pill);
+      background: #FFFFFF;
+    }
+
+    /* Form Fields for Card */
+    .field-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .field-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .field-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+    .field-input {
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #FAFAFA;
+      padding: 0 12px;
+      font-size: 13px;
+      font-family: monospace;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .field-row { display: flex; gap: 10px; }
+    .field-row .field-wrap { flex: 1; }
+
+    .mock-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-light);
+      border-radius: 12px;
+      padding: 11px 13px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+    .mock-badge svg { width: 16px; height: 16px; flex: none; }
+
+    .btn-primary {
+      height: 50px;
+      border-radius: var(--radius-btn);
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-cta);
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+
+    /* Modern Glassy Floating Bottom Navigation Bar (Present on every screen) */
+    .floating-nav {
+      position: absolute;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-floating);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      z-index: 50;
+    }
+    .nav-btn {
+      height: 44px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      padding: 0 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .nav-btn.icon-only { width: 44px; padding: 0; }
+    .nav-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+    }
+    .nav-btn svg { width: 19px; height: 19px; flex: none; }
+  </style>
+</head>
+<body>
+
+<div class="screen" id="screen-06">
+  <!-- Native Status Bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusbar-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1" width="3" height="11" rx="0.5"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 10.5a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM3.8 6.6a6 6 0 0 1 8.4 0l-1.2 1.2a4.3 4.3 0 0 0-6 0zM1 3.8a10 10 0 0 1 14 0L13.8 5a8.3 8.3 0 0 0-11.6 0z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" strokeWidth="1"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Standard Topbar (52px) with CZ Ticket Logo -->
+  <div class="topbar">
+    <a href="05-review.html" class="icon-btn" title="Back" style="width:38px;height:38px;min-width:38px;min-height:38px;flex:0 0 38px;flex-shrink:0;">
+      <span class="icon-wrap-20" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m15 18-6-6 6-6"/></svg>
+      </span>
+    </a>
+    <div class="topbar-title">Payment</div>
+    <!-- CZ Ticket Brand Mark -->
+    <svg class="cz-logo-small" width="36" height="20" viewBox="0 0 180 100" fill="currentColor" style="width:36px;height:20px;min-width:36px;min-height:20px;flex:0 0 36px;flex-shrink:0;display:block;">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0H170V8H180V16H170V24H180V32H170V40H180V48H170V56H180V64H170V72H180V80H170V88H180V96H170V100H10V96H0V88H10V80H0V72H10V64H0V56H10V48H0V40H10V32H0V24H10V16H0V8H10V0ZM18 10H24V16H18V10ZM18 24H24V30H18V24ZM18 38H24V44H18V38ZM18 52H24V58H18V52ZM18 66H24V72H18V66ZM18 80H24V86H18V80ZM156 10H162V16H156V10ZM156 24H162V30H156V24ZM156 38H162V44H156V38ZM156 52H162V58H156V52ZM156 66H162V72H156V66ZM156 80H162V86H156V80Z"/>
+      <g transform="translate(90, 50) skewX(-14) translate(-90, -50)">
+        <path fill="#FFFFFF" d="M40 28C40 23 44 19 52 19H77C85 19 89 23 89 31V39H71V34H58V66H71V61H89V69C89 77 85 81 77 81H52C44 81 40 77 40 72V28Z"/>
+        <path fill="#FFFFFF" d="M94 19H144V33L115 67H144V81H94V67L123 33H94V19Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Amount Due Card -->
+    <div class="amount-card">
+      <div class="amount-lbl">Total Amount Due</div>
+      <div class="amount-val" id="payment-amount-val">$25.50</div>
+      <div class="amount-sub" id="payment-amount-sub">2 Tickets • Cineplex Downtown</div>
+    </div>
+
+    <div class="section-label">Select Payment Method</div>
+
+    <!-- Option 1: Credit / Debit Card (Active) -->
+    <div class="pay-tile selected" data-method="card">
+      <div class="pay-icon-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <div class="pay-info">
+        <div class="pay-name">Credit / Debit Card</div>
+        <div class="pay-desc">Visa, Mastercard, Amex</div>
+      </div>
+      <div class="radio-circle checked"></div>
+    </div>
+
+    <!-- Option 2: Apple Pay -->
+    <div class="pay-tile" data-method="apple">
+      <div class="pay-icon-box" style="color: #1A1A1A;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.78 1.07-1.85.95-2.94-.95.04-2.07.64-2.73 1.43-.59.69-1.11 1.8-1 2.87 1.06.08 2.15-.55 2.78-1.36z"/></svg>
+      </div>
+      <div class="pay-info">
+        <div class="pay-name">Apple Pay / Google Pay</div>
+        <div class="pay-desc">Instant biometric checkout</div>
+      </div>
+      <div class="radio-circle"></div>
+    </div>
+
+    <!-- Option 3: CineBuzz Wallet -->
+    <div class="pay-tile" data-method="wallet">
+      <div class="pay-icon-box" style="color: #2ECC71;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      </div>
+      <div class="pay-info">
+        <div class="pay-name">CineBuzz Wallet</div>
+        <div class="pay-desc">Available Balance: $50.00</div>
+      </div>
+      <div class="radio-circle"></div>
+    </div>
+
+    <!-- Card Fields Enclosure -->
+    <div class="field-card" id="card-fields">
+      <div class="field-wrap">
+        <span class="field-label">Card Number</span>
+        <div class="field-input">
+          <span>4532 •••• •••• 8821</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent);"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-wrap">
+          <span class="field-label">Expiry Date</span>
+          <div class="field-input">09 / 28</div>
+        </div>
+        <div class="field-wrap">
+          <span class="field-label">CVV</span>
+          <div class="field-input">•••</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock Notice Banner -->
+    <div class="mock-badge">
+      <span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </span>
+      <span>This is a mock payment step. No real transaction will occur.</span>
+    </div>
+
+    <!-- Primary Action Button positioned above nav bar -->
+    <a href="07-confirmation.html" class="btn-primary" id="btn-pay">
+      <span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      Pay Now ($25.50)
+    </a>
+  </div>
+
+  <!-- Modern Floating Bottom Navigation Bar (Active: Payment Step 4/4) -->
+  <nav class="floating-nav" aria-label="Bottom Navigation">
+    <a href="01-home.html" class="nav-btn icon-only" title="Home">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+    </a>
+    <a href="02-movie-details.html" class="nav-btn icon-only" title="Explore">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </span>
+    </a>
+    <a href="06-payment.html" class="nav-btn active" title="Booking Flow: Payment" aria-current="page">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      <span>Payment • 4/4</span>
+    </a>
+    <a href="01-home.html" class="nav-btn icon-only" title="Profile">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  let grandTotal = '25.50';
+  let seatCount = 2;
+  let cinemaName = 'Cineplex Downtown';
+
+  try {
+    const savedTotal = localStorage.getItem('cinebuzz_grand_total');
+    if (savedTotal) grandTotal = savedTotal;
+    const savedSeats = localStorage.getItem('cinebuzz_seats');
+    if (savedSeats) {
+      const parsed = JSON.parse(savedSeats);
+      if (Array.isArray(parsed)) seatCount = parsed.length;
+    }
+    const savedCinema = localStorage.getItem('cinebuzz_cinema');
+    if (savedCinema) cinemaName = savedCinema;
+  } catch(e) {}
+
+  const amountVal = document.getElementById('payment-amount-val');
+  const amountSub = document.getElementById('payment-amount-sub');
+  const btnPay = document.getElementById('btn-pay');
+  const cardFields = document.getElementById('card-fields');
+
+  if (amountVal) amountVal.innerText = `$${grandTotal}`;
+  if (amountSub) amountSub.innerText = `${seatCount} Tickets • ${cinemaName.split(' ')[0]}`;
+  if (btnPay) {
+    btnPay.innerHTML = `<span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Pay Now ($${grandTotal})`;
+  }
+
+  // Payment method switcher
+  document.querySelectorAll('.pay-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      document.querySelectorAll('.pay-tile').forEach(t => {
+        t.classList.remove('selected');
+        const rc = t.querySelector('.radio-circle');
+        if (rc) rc.classList.remove('checked');
+      });
+
+      tile.classList.add('selected');
+      const radio = tile.querySelector('.radio-circle');
+      if (radio) radio.classList.add('checked');
+
+      const method = tile.getAttribute('data-method');
+      if (method === 'card') {
+        if (cardFields) cardFields.style.display = 'block';
+      } else {
+        if (cardFields) cardFields.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, height=844, initial-scale=1.0">
+  <title>CineBuzz - 03 Cinema & Showtime</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8A8A8A;
+      --accent: #E63946;
+      --accent-light: #FCE8EA;
+      --border: #EFEFEF;
+      --border-strong: #E2E2E2;
+      --radius-card: 18px;
+      --radius-btn: 16px;
+      --radius-pill: 999px;
+      --radius-input: 14px;
+      --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-floating: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
+      --shadow-cta: 0 8px 24px -4px rgba(230, 57, 70, 0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    svg { flex-shrink: 0; }
+    body {
+      background: #121214;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, sans-serif;
+      color: var(--text-primary);
+    }
+    .screen {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+    .statusbar {
+      height: 44px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg);
+      z-index: 30;
+    }
+    .statusbar-icons { display: flex; align-items: center; gap: 6px; }
+    .topbar {
+      flex: none;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: var(--bg);
+    }
+    .topbar-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-pill);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .cz-logo-small {
+      width: 36px;
+      height: 20px;
+      color: #1A1A1A;
+    }
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 20px 96px;
+      scrollbar-width: none;
+    }
+    .scroll-content::-webkit-scrollbar { display: none; }
+    
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .date-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+    .date-strip::-webkit-scrollbar { display: none; }
+    button.date-chip, button.time-pill {
+      font-family: inherit;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .date-chip {
+      flex: none;
+      width: 52px;
+      height: 66px;
+      border-radius: var(--radius-input);
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .date-chip:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .date-chip:active {
+      transform: scale(0.92);
+    }
+    .date-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.35);
+      transform: translateY(-1px);
+    }
+    .date-chip .dow { font-size: 10.5px; font-weight: 600; opacity: 0.85; text-transform: uppercase; }
+    .date-chip .dnum { font-size: 17px; font-weight: 800; }
+
+    .cinema-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 12px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.2s ease;
+    }
+    .cinema-card:hover {
+      border-color: #D1D5DB;
+    }
+    .cinema-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1.5px var(--accent), 0 8px 20px -4px rgba(230, 57, 70, 0.15);
+    }
+    .cinema-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .cinema-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .cinema-address { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .distance-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      flex: none;
+    }
+    .showtime-grid {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .time-pill {
+      border-radius: var(--radius-pill);
+      padding: 8px 15px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #FAFAFA;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .time-pill:hover {
+      border-color: var(--accent);
+      background: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .time-pill:active {
+      transform: scale(0.92);
+    }
+    .time-pill.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    /* Action Card above nav */
+    .action-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      margin-top: 16px;
+      margin-bottom: 12px;
+    }
+    .selection-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .summary-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+    .summary-val { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .progress-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-pill);
+      background: var(--border-strong);
+    }
+    .dot.active {
+      background: var(--accent);
+      width: 16px;
+    }
+    .btn-primary {
+      height: 50px;
+      border-radius: var(--radius-btn);
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-cta);
+      text-decoration: none;
+    }
+
+    /* Modern Glassy Floating Bottom Navigation Bar (Present on every screen) */
+    .floating-nav {
+      position: absolute;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-floating);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      z-index: 50;
+    }
+    .nav-btn {
+      height: 44px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      padding: 0 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .nav-btn.icon-only { width: 44px; padding: 0; }
+    .nav-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+    }
+    .nav-btn svg { width: 19px; height: 19px; flex: none; }
+  </style>
+</head>
+<body>
+
+<div class="screen" id="screen-03">
+  <!-- Native Status Bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusbar-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1" width="3" height="11" rx="0.5"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 10.5a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM3.8 6.6a6 6 0 0 1 8.4 0l-1.2 1.2a4.3 4.3 0 0 0-6 0zM1 3.8a10 10 0 0 1 14 0L13.8 5a8.3 8.3 0 0 0-11.6 0z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Standard Topbar (52px) with CZ Ticket Logo -->
+  <div class="topbar">
+    <a href="02-movie-details.html" class="icon-btn" title="Back" style="width:38px;height:38px;min-width:38px;min-height:38px;flex:0 0 38px;flex-shrink:0;">
+      <span class="icon-wrap-20" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m15 18-6-6 6-6"/></svg>
+      </span>
+    </a>
+    <div class="topbar-title">Choose Cinema & Time</div>
+    <!-- CZ Ticket Brand Mark -->
+    <svg class="cz-logo-small" width="36" height="20" viewBox="0 0 180 100" fill="currentColor" style="width:36px;height:20px;min-width:36px;min-height:20px;flex:0 0 36px;flex-shrink:0;display:block;">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0H170V8H180V16H170V24H180V32H170V40H180V48H170V56H180V64H170V72H180V80H170V88H180V96H170V100H10V96H0V88H10V80H0V72H10V64H0V56H10V48H0V40H10V32H0V24H10V16H0V8H10V0ZM18 10H24V16H18V10ZM18 24H24V30H18V24ZM18 38H24V44H18V38ZM18 52H24V58H18V52ZM18 66H24V72H18V66ZM18 80H24V86H18V80ZM156 10H162V16H156V10ZM156 24H162V30H156V24ZM156 38H162V44H156V38ZM156 52H162V58H156V52ZM156 66H162V72H156V66ZM156 80H162V86H156V80Z"/>
+      <g transform="translate(90, 50) skewX(-14) translate(-90, -50)">
+        <path fill="#FFFFFF" d="M40 28C40 23 44 19 52 19H77C85 19 89 23 89 31V39H71V34H58V66H71V61H89V69C89 77 85 81 77 81H52C44 81 40 77 40 72V28Z"/>
+        <path fill="#FFFFFF" d="M94 19H144V33L115 67H144V81H94V67L123 33H94V19Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="scroll-content">
+    <div class="section-label">Select Date</div>
+    <!-- 7-Day Date Scroller with Real Touch Buttons -->
+    <div class="date-strip">
+      <button type="button" class="date-chip">
+        <span class="dow">Wed</span>
+        <span class="dnum">24</span>
+      </button>
+      <button type="button" class="date-chip active">
+        <span class="dow">Thu</span>
+        <span class="dnum">25</span>
+      </button>
+      <button type="button" class="date-chip">
+        <span class="dow">Fri</span>
+        <span class="dnum">26</span>
+      </button>
+      <button type="button" class="date-chip">
+        <span class="dow">Sat</span>
+        <span class="dnum">27</span>
+      </button>
+      <button type="button" class="date-chip">
+        <span class="dow">Sun</span>
+        <span class="dnum">28</span>
+      </button>
+      <button type="button" class="date-chip">
+        <span class="dow">Mon</span>
+        <span class="dnum">29</span>
+      </button>
+      <button type="button" class="date-chip">
+        <span class="dow">Tue</span>
+        <span class="dnum">30</span>
+      </button>
+    </div>
+
+    <div class="section-label">Available Cinemas</div>
+
+    <!-- Cinema Card 1: Selected Cineplex Downtown -->
+    <div class="cinema-card selected" data-cinema="Cineplex Downtown">
+      <div class="cinema-head">
+        <div>
+          <div class="cinema-title">Cineplex Downtown</div>
+          <div class="cinema-address">402 Grand Avenue • IMAX Laser</div>
+        </div>
+        <div class="distance-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          2.3 km
+        </div>
+      </div>
+      <div class="showtime-grid">
+        <button type="button" class="time-pill">1:30 PM</button>
+        <button type="button" class="time-pill active">4:15 PM</button>
+        <button type="button" class="time-pill">7:00 PM</button>
+        <button type="button" class="time-pill">9:45 PM</button>
+      </div>
+    </div>
+
+    <!-- Cinema Card 2: Starlight Cinemas -->
+    <div class="cinema-card" data-cinema="Starlight Cinemas Mall Rd">
+      <div class="cinema-head">
+        <div>
+          <div class="cinema-title">Starlight Cinemas Mall Rd</div>
+          <div class="cinema-address">88 West End Boulevard • Dolby Atmos</div>
+        </div>
+        <div class="distance-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          4.8 km
+        </div>
+      </div>
+      <div class="showtime-grid">
+        <button type="button" class="time-pill">2:00 PM</button>
+        <button type="button" class="time-pill">5:15 PM</button>
+        <button type="button" class="time-pill">7:30 PM</button>
+        <button type="button" class="time-pill">10:15 PM</button>
+      </div>
+    </div>
+
+    <!-- Cinema Card 3: Riverside Grand -->
+    <div class="cinema-card" data-cinema="Riverside Grand Screens">
+      <div class="cinema-head">
+        <div>
+          <div class="cinema-title">Riverside Grand Screens</div>
+          <div class="cinema-address">148 Riverside Ave • 4DX Luxury</div>
+        </div>
+        <div class="distance-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          6.1 km
+        </div>
+      </div>
+      <div class="showtime-grid">
+        <button type="button" class="time-pill">12:45 PM</button>
+        <button type="button" class="time-pill">3:30 PM</button>
+        <button type="button" class="time-pill">6:45 PM</button>
+        <button type="button" class="time-pill">10:00 PM</button>
+      </div>
+    </div>
+
+    <!-- Action Card with Progress Dots and Primary CTA -->
+    <div class="action-card">
+      <div class="selection-summary">
+        <div>
+          <div class="summary-label">Selected Showtime</div>
+          <div class="summary-val">Cineplex Downtown • 4:15 PM</div>
+        </div>
+        <div class="progress-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <a href="04-seats.html" class="btn-primary" id="btn-continue-seats">
+        Continue to Seats
+        <span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Modern Floating Bottom Navigation Bar (Active: Showtime Step 1/4) -->
+  <nav class="floating-nav" aria-label="Bottom Navigation">
+    <a href="01-home.html" class="nav-btn icon-only" title="Home">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+    </a>
+    <a href="02-movie-details.html" class="nav-btn icon-only" title="Explore">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </span>
+    </a>
+    <a href="03-cinema-showtime.html" class="nav-btn active" title="Booking Flow: Showtime" aria-current="page">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19"/></svg>
+      </span>
+      <span>Showtime • 1/4</span>
+    </a>
+    <a href="01-home.html" class="nav-btn icon-only" title="Profile">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  let currentCinema = 'Cineplex Downtown';
+  let currentTime = '4:15 PM';
+  let currentDate = 'Thu 25';
+
+  function triggerHaptic() {
+    if ('vibrate' in navigator) {
+      try { navigator.vibrate(10); } catch(e) {}
+    }
+  }
+
+  // Date chips interaction
+  document.querySelectorAll('.date-chip').forEach(chip => {
+    const handleDateSelect = (e) => {
+      e.preventDefault();
+      triggerHaptic();
+      document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const dow = chip.querySelector('.dow')?.innerText.trim() || '';
+      const dnum = chip.querySelector('.dnum')?.innerText.trim() || '';
+      currentDate = `${dow} ${dnum}`.trim();
+      updateSummary();
+    };
+    chip.addEventListener('click', handleDateSelect);
+  });
+
+  // Cinema card & time pills interaction
+  document.querySelectorAll('.cinema-card').forEach(card => {
+    const titleEl = card.querySelector('.cinema-title');
+    const title = titleEl ? titleEl.innerText.trim() : 'Cinema';
+
+    // Clicking anywhere on cinema card
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.time-pill')) {
+        triggerHaptic();
+        document.querySelectorAll('.cinema-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        currentCinema = title;
+        
+        // Ensure one time pill in this card is selected
+        let activeInCard = card.querySelector('.time-pill.active');
+        if (!activeInCard) {
+          document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+          const firstPill = card.querySelector('.time-pill');
+          if (firstPill) {
+            firstPill.classList.add('active');
+            currentTime = firstPill.innerText.trim();
+          }
+        } else {
+          currentTime = activeInCard.innerText.trim();
+        }
+        updateSummary();
+      }
+    });
+
+    // Clicking specific time pill
+    card.querySelectorAll('.time-pill').forEach(pill => {
+      const handlePillSelect = (e) => {
+        e.stopPropagation();
+        triggerHaptic();
+        document.querySelectorAll('.cinema-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+        card.classList.add('selected');
+        pill.classList.add('active');
+        currentCinema = title;
+        currentTime = pill.innerText.trim();
+        updateSummary();
+      };
+      pill.addEventListener('click', handlePillSelect);
+    });
+  });
+
+  function updateSummary() {
+    const summaryVal = document.querySelector('.summary-val');
+    if (summaryVal) {
+      summaryVal.innerText = `${currentCinema} • ${currentTime}`;
+    }
+    const btnContinue = document.getElementById('btn-continue-seats');
+    if (btnContinue) {
+      btnContinue.href = `04-seats.html?cinema=${encodeURIComponent(currentCinema)}&time=${encodeURIComponent(currentTime)}&date=${encodeURIComponent(currentDate)}`;
+    }
+    try {
+      localStorage.setItem('cinebuzz_cinema', currentCinema);
+      localStorage.setItem('cinebuzz_showtime', currentTime);
+      localStorage.setItem('cinebuzz_date', currentDate);
+    } catch(e) {}
+  }
+
+  // Initial sync
+  updateSummary();
+</script>
+
+</body>
+</html>

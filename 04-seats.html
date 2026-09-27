@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, height=844, initial-scale=1.0">
+  <title>CineBuzz - 04 Seat Selection</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8A8A8A;
+      --accent: #E63946;
+      --accent-light: #FCE8EA;
+      --border: #EFEFEF;
+      --border-strong: #E2E2E2;
+      --seat-available: #F0F0F0;
+      --seat-selected: #E63946;
+      --seat-booked: #D8D8D8;
+      --radius-card: 18px;
+      --radius-btn: 16px;
+      --radius-pill: 999px;
+      --radius-seat: 6px;
+      --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-floating: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
+      --shadow-cta: 0 8px 24px -4px rgba(230, 57, 70, 0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    svg { flex-shrink: 0; }
+    body {
+      background: #121214;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, sans-serif;
+      color: var(--text-primary);
+    }
+    .screen {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+    .statusbar {
+      height: 44px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg);
+      z-index: 30;
+    }
+    .statusbar-icons { display: flex; align-items: center; gap: 6px; }
+    .topbar {
+      flex: none;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: var(--bg);
+    }
+    .header-text { text-align: center; flex: 1; }
+    .topbar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .topbar-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-pill);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .cz-logo-small {
+      width: 36px;
+      height: 20px;
+      color: #1A1A1A;
+    }
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 96px;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .scroll-content::-webkit-scrollbar { display: none; }
+
+    /* Screen Curve */
+    .screen-indicator-wrap {
+      width: 260px;
+      margin: 12px 0 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .screen-curve {
+      width: 100%;
+      height: 18px;
+      border-top: 3.5px solid var(--accent);
+      border-radius: 130px 130px 0 0;
+      opacity: 0.9;
+    }
+    .screen-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Grid Enclosure Card */
+    .seat-card {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 16px 12px 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .seat-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5.5px;
+      margin-bottom: 14px;
+    }
+    .seat-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .row-id {
+      width: 14px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    button.seat {
+      font-family: inherit;
+      outline: none;
+      border: 1px solid transparent;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .seat {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-seat);
+      background: var(--seat-available);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .seat:not(.booked):hover {
+      border-color: var(--accent);
+      transform: scale(1.08);
+      background: #FFFFFF;
+    }
+    .seat:not(.booked):active {
+      transform: scale(0.85);
+    }
+    .seat.selected {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+      box-shadow: 0 3px 10px rgba(230, 57, 70, 0.45);
+      transform: scale(1.05);
+    }
+    .seat.booked {
+      background: var(--seat-booked);
+      color: var(--text-secondary);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    @keyframes seatWobble {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px) rotate(-3deg); }
+      40% { transform: translateX(4px) rotate(3deg); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+    }
+    .seat.wobble {
+      animation: seatWobble 0.35s ease-in-out;
+    }
+    .seat-toast {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(26, 26, 30, 0.94);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 999px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .seat-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .legend-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    /* Action Summary Card */
+    .action-card {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
+    }
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .summary-caption { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+    .summary-value { font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin-top: 1px; }
+    .progress-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-pill);
+      background: var(--border-strong);
+    }
+    .dot.active {
+      background: var(--accent);
+      width: 16px;
+    }
+    .btn-primary {
+      height: 50px;
+      border-radius: var(--radius-btn);
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-cta);
+      text-decoration: none;
+    }
+
+    /* Modern Glassy Floating Bottom Navigation Bar (Present on every screen) */
+    .floating-nav {
+      position: absolute;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-floating);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      z-index: 50;
+    }
+    .nav-btn {
+      height: 44px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      padding: 0 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .nav-btn.icon-only { width: 44px; padding: 0; }
+    .nav-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+    }
+    .nav-btn svg { width: 19px; height: 19px; flex: none; }
+  </style>
+</head>
+<body>
+
+<div class="screen" id="screen-04">
+  <!-- Native Status Bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusbar-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="0.5"/><rect x="4.5" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1" width="3" height="11" rx="0.5"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 10.5a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM3.8 6.6a6 6 0 0 1 8.4 0l-1.2 1.2a4.3 4.3 0 0 0-6 0zM1 3.8a10 10 0 0 1 14 0L13.8 5a8.3 8.3 0 0 0-11.6 0z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Standard Topbar (52px) with CZ Ticket Logo -->
+  <div class="topbar">
+    <a href="03-cinema-showtime.html" class="icon-btn" title="Back" style="width:38px;height:38px;min-width:38px;min-height:38px;flex:0 0 38px;flex-shrink:0;">
+      <span class="icon-wrap-20" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m15 18-6-6 6-6"/></svg>
+      </span>
+    </a>
+    <div class="header-text">
+      <div class="topbar-title">Select Your Seats</div>
+      <div class="topbar-sub">Cineplex Downtown • 4:15 PM</div>
+    </div>
+    <!-- CZ Ticket Brand Mark -->
+    <svg class="cz-logo-small" width="36" height="20" viewBox="0 0 180 100" fill="currentColor" style="width:36px;height:20px;min-width:36px;min-height:20px;flex:0 0 36px;flex-shrink:0;display:block;">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0H170V8H180V16H170V24H180V32H170V40H180V48H170V56H180V64H170V72H180V80H170V88H180V96H170V100H10V96H0V88H10V80H0V72H10V64H0V56H10V48H0V40H10V32H0V24H10V16H0V8H10V0ZM18 10H24V16H18V10ZM18 24H24V30H18V24ZM18 38H24V44H18V38ZM18 52H24V58H18V52ZM18 66H24V72H18V66ZM18 80H24V86H18V80ZM156 10H162V16H156V10ZM156 24H162V30H156V24ZM156 38H162V44H156V38ZM156 52H162V58H156V52ZM156 66H162V72H156V66ZM156 80H162V86H156V80Z"/>
+      <g transform="translate(90, 50) skewX(-14) translate(-90, -50)">
+        <path fill="#FFFFFF" d="M40 28C40 23 44 19 52 19H77C85 19 89 23 89 31V39H71V34H58V66H71V61H89V69C89 77 85 81 77 81H52C44 81 40 77 40 72V28Z"/>
+        <path fill="#FFFFFF" d="M94 19H144V33L115 67H144V81H94V67L123 33H94V19Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Screen Arc Indicator -->
+    <div class="screen-indicator-wrap">
+      <div class="screen-curve"></div>
+      <div class="screen-label">SCREEN THIS WAY</div>
+    </div>
+
+    <!-- Seat Matrix Card -->
+    <div class="seat-card">
+      <div class="seat-grid">
+        <!-- Row A -->
+        <div class="seat-row">
+          <span class="row-id">A</span>
+          <div class="seat booked">1</div>
+          <div class="seat booked">2</div>
+          <div class="seat">3</div>
+          <div class="seat">4</div>
+          <div class="seat">5</div>
+          <div class="seat">6</div>
+          <div class="seat">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat booked">10</div>
+          <span class="row-id">A</span>
+        </div>
+        <!-- Row B -->
+        <div class="seat-row">
+          <span class="row-id">B</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat">3</div>
+          <div class="seat">4</div>
+          <div class="seat">5</div>
+          <div class="seat">6</div>
+          <div class="seat">7</div>
+          <div class="seat">8</div>
+          <div class="seat booked">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">B</span>
+        </div>
+        <!-- Row C -->
+        <div class="seat-row">
+          <span class="row-id">C</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat">3</div>
+          <div class="seat">4</div>
+          <div class="seat">5</div>
+          <div class="seat">6</div>
+          <div class="seat booked">7</div>
+          <div class="seat booked">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">C</span>
+        </div>
+        <!-- Row D -->
+        <div class="seat-row">
+          <span class="row-id">D</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat booked">3</div>
+          <div class="seat">4</div>
+          <div class="seat">5</div>
+          <div class="seat">6</div>
+          <div class="seat booked">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">D</span>
+        </div>
+        <!-- Row E (E5 & E6 Selected) -->
+        <div class="seat-row">
+          <span class="row-id">E</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat">3</div>
+          <div class="seat">4</div>
+          <div class="seat selected">5</div>
+          <div class="seat selected">6</div>
+          <div class="seat">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">E</span>
+        </div>
+        <!-- Row F -->
+        <div class="seat-row">
+          <span class="row-id">F</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat">3</div>
+          <div class="seat">4</div>
+          <div class="seat booked">5</div>
+          <div class="seat">6</div>
+          <div class="seat">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">F</span>
+        </div>
+        <!-- Row G -->
+        <div class="seat-row">
+          <span class="row-id">G</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat">3</div>
+          <div class="seat booked">4</div>
+          <div class="seat">5</div>
+          <div class="seat">6</div>
+          <div class="seat">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">G</span>
+        </div>
+        <!-- Row H -->
+        <div class="seat-row">
+          <span class="row-id">H</span>
+          <div class="seat">1</div>
+          <div class="seat">2</div>
+          <div class="seat booked">3</div>
+          <div class="seat">4</div>
+          <div class="seat booked">5</div>
+          <div class="seat booked">6</div>
+          <div class="seat booked">7</div>
+          <div class="seat">8</div>
+          <div class="seat">9</div>
+          <div class="seat">10</div>
+          <span class="row-id">H</span>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-box">
+        <div class="legend-item">
+          <span class="legend-swatch" style="background: var(--seat-available); border: 1px solid var(--border);"></span>
+          Available
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch" style="background: var(--seat-selected);"></span>
+          Selected
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch" style="background: var(--seat-booked);"></span>
+          Booked
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Card directly in content above floating nav -->
+    <div class="action-card">
+      <div class="summary-row">
+        <div>
+          <div class="summary-caption" id="summary-seats-caption">Selected Seats (2)</div>
+          <div class="summary-value" id="summary-seats-val" style="color: var(--accent);">E5, E6</div>
+        </div>
+        <div class="progress-dots">
+          <span class="dot"></span>
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <div style="text-align: right;">
+          <div class="summary-caption">Total Amount</div>
+          <div class="summary-value" id="summary-total-val">$24.00</div>
+        </div>
+      </div>
+      <a href="05-review.html" class="btn-primary" id="btn-continue">
+        Continue to Review
+        <span class="icon-wrap-18" style="width:18px;height:18px;min-width:18px;min-height:18px;flex:0 0 18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;display:block;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Modern Floating Bottom Navigation Bar (Active: Seats Step 2/4) -->
+  <nav class="floating-nav" aria-label="Bottom Navigation">
+    <a href="01-home.html" class="nav-btn icon-only" title="Home">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+    </a>
+    <a href="02-movie-details.html" class="nav-btn icon-only" title="Explore">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </span>
+    </a>
+    <a href="04-seats.html" class="nav-btn active" title="Booking Flow: Seats" aria-current="page">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19"/></svg>
+      </span>
+      <span>Seats • 2/4</span>
+    </a>
+    <a href="01-home.html" class="nav-btn icon-only" title="Profile">
+      <span class="nav-icon-wrap" style="width:20px;height:20px;min-width:20px;min-height:20px;flex:0 0 20px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;display:block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  const TICKET_PRICE = 12.00;
+
+  // Initialize seat click handlers
+  document.querySelectorAll('.seat-row').forEach(row => {
+    const rowIdEl = row.querySelector('.row-id');
+    const rowLetter = rowIdEl ? rowIdEl.innerText.trim() : '';
+
+    row.querySelectorAll('.seat').forEach(seat => {
+      seat.addEventListener('click', () => {
+        if (seat.classList.contains('booked')) {
+          // Play subtle feedback that seat is booked
+          seat.style.transform = 'scale(0.9)';
+          setTimeout(() => seat.style.transform = '', 150);
+          return;
+        }
+
+        // Toggle selected state
+        seat.classList.toggle('selected');
+        updateSeatsUI();
+      });
+    });
+  });
+
+  function updateSeatsUI() {
+    const selectedSeats = [];
+
+    document.querySelectorAll('.seat-row').forEach(row => {
+      const rowIdEl = row.querySelector('.row-id');
+      const rowLetter = rowIdEl ? rowIdEl.innerText.trim() : '';
+
+      row.querySelectorAll('.seat.selected').forEach(seat => {
+        selectedSeats.push(`${rowLetter}${seat.innerText.trim()}`);
+      });
+    });
+
+    const count = selectedSeats.length;
+    const total = (count * TICKET_PRICE).toFixed(2);
+
+    const captionEl = document.getElementById('summary-seats-caption');
+    const valEl = document.getElementById('summary-seats-val');
+    const totalEl = document.getElementById('summary-total-val');
+    const btnContinue = document.getElementById('btn-continue');
+
+    if (captionEl) captionEl.innerText = `Selected Seats (${count})`;
+    if (valEl) valEl.innerText = count > 0 ? selectedSeats.join(', ') : 'None selected';
+    if (totalEl) totalEl.innerText = `$${total}`;
+
+    if (btnContinue) {
+      if (count === 0) {
+        btnContinue.style.opacity = '0.5';
+        btnContinue.style.pointerEvents = 'none';
+      } else {
+        btnContinue.style.opacity = '1';
+        btnContinue.style.pointerEvents = 'auto';
+      }
+    }
+
+    try {
+      localStorage.setItem('cinebuzz_seats', JSON.stringify(selectedSeats));
+      localStorage.setItem('cinebuzz_total', total);
+    } catch(e) {}
+  }
+
+  // Load any previously saved seats on page load
+  try {
+    const saved = localStorage.getItem('cinebuzz_seats');
+    if (saved) {
+      const seatList = JSON.parse(saved);
+      if (Array.isArray(seatList) && seatList.length > 0) {
+        // Clear default selections first
+        document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
+        
+        document.querySelectorAll('.seat-row').forEach(row => {
+          const rowLetter = row.querySelector('.row-id')?.innerText.trim();
+          row.querySelectorAll('.seat').forEach(seat => {
+            const seatCode = `${rowLetter}${seat.innerText.trim()}`;
+            if (seatList.includes(seatCode) && !seat.classList.contains('booked')) {
+              seat.classList.add('selected');
+            }
+          });
+        });
+        updateSeatsUI();
+      }
+    }
+  } catch(e) {}
+</script>
+
+</body>
+</html>
